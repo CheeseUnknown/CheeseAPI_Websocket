@@ -1,0 +1,11 @@
+__pycache__
+.DS_Store
+.vscode
+build
+dist
+*.egg-info
+logs
+static
+media
+test*
+test.py
