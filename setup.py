@@ -5,7 +5,7 @@ with open('./README.md', 'r', encoding = 'utf-8') as f:
 
 setuptools.setup(
     name = 'CheeseAPI_Websocket',
-    version = '0.0.1',
+    version = '0.1.0',
     author = 'Cheese Unknown',
     author_email = 'cheese@cheese.ren',
     description = '一款基于CheeseAPI的升级款Websocket插件',
