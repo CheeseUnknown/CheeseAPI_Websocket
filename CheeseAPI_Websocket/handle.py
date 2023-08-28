@@ -29,9 +29,8 @@ async def __websocket_connectionHandle(protocol: 'WebsocketProtocol'):
                     await protocol.func[0].close()
                 elif value['type'] in [ 'text', 'bytes' ]:
                     await protocol.func[0].send(value['data'])
-
     except asyncio.CancelledError:
-        ...
+        await pubsub.close()
 
 async def _websocket_connectionHandle(protocol: 'WebsocketProtocol', app):
     logger.websocket(f'The {protocol.request.header.get("X-Forwarded-For").split(", ")[0]} connected WEBSOCKET {protocol.request.fullPath}', f'The <cyan>{protocol.request.header.get("X-Forwarded-For").split(", ")[0]}</cyan> connected <cyan>WEBSOCKET {protocol.request.fullPath}</cyan>')
