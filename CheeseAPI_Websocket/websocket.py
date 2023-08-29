@@ -15,38 +15,38 @@ class Websocket:
         self.redis = Redis(host, port, db)
         self.async_redis = async_Redis(host = host, port = port, db = db)
 
-    def send(self, path: str, data: str | bytes | list | dict, sid: str | List[str] | Literal['*'] = '*'):
+    def send(self, path: str, message: str | bytes | list | dict, sid: str | List[str] | Literal['*'] = '*'):
         if not self.redis:
             raise ConnectionError('Redis has not be connected')
 
-        if isinstance(data, bytes):
+        if isinstance(message, bytes):
             self.redis.publish('Websocket_' + path, json.dumps({
                 'sid': sid,
                 'type': 'bytes',
-                'data': ''
-            }).encode().replace(b'"data": ""', b'"data": "' + data + b'"'))
+                'message': ''
+            }).encode().replace(b'"message": ""', b'"message": "' + message + b'"'))
         else:
             self.redis.publish('Websocket_' + path, json.dumps({
                 'sid': sid,
                 'type': 'text',
-                'data': data
+                'message': message
             }))
 
-    async def async_send(self, path: str, data: str | bytes | list | dict, sid: str | List[str] | Literal['*'] = '*'):
+    async def async_send(self, path: str, message: str | bytes | list | dict, sid: str | List[str] | Literal['*'] = '*'):
         if not self.async_redis:
             raise ConnectionError('Redis has not be connected')
 
-        if isinstance(data, bytes):
+        if isinstance(message, bytes):
             await self.async_redis.publish(f'Websocket_{path}', json.dumps({
                 'sid': sid,
                 'type': 'bytes',
-                'data': ''
-            }).encode().replace(b'"data": ""', b'"data": "' + data + '"'))
+                'message': ''
+            }).encode().replace(b'"message": ""', b'"message": "' + message + '"'))
         else:
             await self.async_redis.publish(f'Websocket_{path}', json.dumps({
                 'sid': sid,
-                'type': 'test',
-                'data': data
+                'type': 'text',
+                'message': message
             }))
 
     def close(self, path: str, sid: str | List[str] | Literal['*'] = '*'):

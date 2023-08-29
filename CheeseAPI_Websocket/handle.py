@@ -18,9 +18,9 @@ async def __websocket_connectionHandle(protocol: 'WebsocketProtocol'):
             value = (await pubsub.parse_response())[2]
 
             if re.search(br'"type": "bytes"', value):
-                match = re.search(br'"data": ".*"', value).group()[9:-1]
-                value = json.loads(value.replace(br', "data": "' + match + br'"', b''))
-                value['data'] = match
+                match = re.search(br'"message": ".*"', value).group()[9:-1]
+                value = json.loads(value.replace(br', "message": "' + match + br'"', b''))
+                value['message'] = match
             else:
                 value = json.loads(value)
 
@@ -28,7 +28,7 @@ async def __websocket_connectionHandle(protocol: 'WebsocketProtocol'):
                 if value['type'] == 'close':
                     await protocol.func[0].close()
                 elif value['type'] in [ 'text', 'bytes' ]:
-                    await protocol.func[0].send(value['data'])
+                    await protocol.func[0].send(value['message'])
     except asyncio.CancelledError:
         await pubsub.close()
 
