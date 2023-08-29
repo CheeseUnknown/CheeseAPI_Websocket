@@ -1,7 +1,7 @@
 import asyncio, re, json
 from typing import TYPE_CHECKING
 
-from CheeseAPI import app, async_doFunc
+from CheeseAPI import app, async_doFunc, doFunc
 from CheeseLog import logger
 
 from CheeseAPI_Websocket.websocket import websocket
@@ -24,7 +24,7 @@ async def __websocket_connectionHandle(protocol: 'WebsocketProtocol'):
             else:
                 value = json.loads(value)
 
-            if value['sid'] == '*' or protocol.request.header['Sec-Websocket-Key']  == value or protocol.request.header['Sec-Websocket-Key'] in value['sid']:
+            if value['sid'] == '*' or protocol.request.headers['Sec-Websocket-Key']  == value or protocol.request.headers['Sec-Websocket-Key'] in value['sid']:
                 if value['type'] == 'close':
                     await protocol.func[0].close()
                 elif value['type'] in [ 'text', 'bytes' ]:
@@ -33,7 +33,7 @@ async def __websocket_connectionHandle(protocol: 'WebsocketProtocol'):
         await pubsub.close()
 
 async def _websocket_connectionHandle(protocol: 'WebsocketProtocol', app):
-    logger.websocket(f'The {protocol.request.header.get("X-Forwarded-For").split(", ")[0]} connected WEBSOCKET {protocol.request.fullPath}', f'The <cyan>{protocol.request.header.get("X-Forwarded-For").split(", ")[0]}</cyan> connected <cyan>WEBSOCKET {protocol.request.fullPath}</cyan>')
+    logger.websocket(f'The {protocol.request.headers.get("X-Forwarded-For").split(", ")[0]} connected WEBSOCKET {protocol.request.fullPath}', f'The <cyan>{protocol.request.headers.get("X-Forwarded-For").split(", ")[0]}</cyan> connected <cyan>WEBSOCKET {protocol.request.fullPath}</cyan>')
 
     protocol.task = asyncio.create_task(__websocket_connectionHandle(protocol))
 
@@ -41,11 +41,12 @@ async def _websocket_connectionHandle(protocol: 'WebsocketProtocol', app):
 
 app.handle._websocket_connectionHandle = _websocket_connectionHandle
 
-async def _websocket_disconnectionHandle(protocol: 'WebsocketProtocol', app):
-    await async_doFunc(protocol.func[0].disconnectionHandle, protocol.func[1])
+def _websocket_disconnectionHandle(protocol: 'WebsocketProtocol', app):
+    doFunc(protocol.func[0].disconnectionHandle, protocol.func[1])
 
-    protocol.task.cancel()
+    if hasattr(protocol, 'task'):
+        protocol.task.cancel()
 
-    logger.websocket(f'The {protocol.request.header.get("X-Forwarded-For").split(", ")[0]} disconnected WEBSOCKET {protocol.request.fullPath}', f'The <cyan>{protocol.request.header.get("X-Forwarded-For").split(", ")[0]}</cyan> disconnected <cyan>WEBSOCKET {protocol.request.fullPath}</cyan>')
+    logger.websocket(f'The {protocol.request.headers.get("X-Forwarded-For").split(", ")[0]} disconnected WEBSOCKET {protocol.request.fullPath}', f'The <cyan>{protocol.request.headers.get("X-Forwarded-For").split(", ")[0]}</cyan> disconnected <cyan>WEBSOCKET {protocol.request.fullPath}</cyan>')
 
 app.handle._websocket_disconnectionHandle = _websocket_disconnectionHandle

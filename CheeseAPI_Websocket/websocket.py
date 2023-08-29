@@ -53,18 +53,18 @@ class Websocket:
         if not self.redis:
             raise ConnectionError('Redis has not be connected')
 
-        self.redis.publish({
+        self.redis.publish('Websocket_' + path, json.dumps({
             'sid': sid,
             'type': 'close'
-        })
+        }))
 
     async def async_close(self, path: str, sid: str | List[str] | Literal['*'] = '*'):
         if not self.async_redis:
             raise ConnectionError('Redis has not be connected')
 
-        await self.async_redis.publish({
+        await self.async_redis.publish('Websocket_' + path, json.dumps({
             'sid': sid,
             'type': 'close'
-        })
+        }))
 
 websocket = Websocket()
