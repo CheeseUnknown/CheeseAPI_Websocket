@@ -1,7 +1,7 @@
 import asyncio, re, json
 from typing import TYPE_CHECKING
 
-from CheeseAPI import app, async_doFunc, doFunc
+from CheeseAPI import app
 from CheeseLog import logger
 
 from CheeseAPI_Websocket.websocket import websocket
@@ -37,12 +37,12 @@ async def _websocket_connectionHandle(protocol: 'WebsocketProtocol', app):
 
     protocol.task = asyncio.create_task(__websocket_connectionHandle(protocol))
 
-    await async_doFunc(protocol.func[0].connectionHandle, protocol.func[1])
+    await protocol.func[0].connectionHandle(**protocol.func[1])
 
 app.handle._websocket_connectionHandle = _websocket_connectionHandle
 
 def _websocket_disconnectionHandle(protocol: 'WebsocketProtocol', app):
-    doFunc(protocol.func[0].disconnectionHandle, protocol.func[1])
+    protocol.func[0].disconnectionHandle(**protocol.func[1])
 
     if hasattr(protocol, 'task'):
         protocol.task.cancel()
