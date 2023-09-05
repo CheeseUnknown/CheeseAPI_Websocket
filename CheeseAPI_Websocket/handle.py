@@ -18,8 +18,9 @@ async def __websocket_connectionHandle(protocol: 'WebsocketProtocol'):
             value = (await pubsub.parse_response())[2]
 
             if re.search(br'"type": "bytes"', value):
-                match = re.search(br'"message": ".*"', value).group()[9:-1]
-                value = json.loads(value.replace(br', "message": "' + match + br'"', b''))
+                span = re.search(br'"type": "bytes"', value)
+                match = value[span.end():-2]
+                value = json.loads(value[:span.start() + b'}'])
                 value['message'] = match
             else:
                 value = json.loads(value)
