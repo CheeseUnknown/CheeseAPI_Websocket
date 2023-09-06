@@ -18,9 +18,9 @@ async def __websocket_connectionHandle(protocol: 'WebsocketProtocol'):
             value = (await pubsub.parse_response())[2]
 
             if re.search(br'"type": "bytes"', value):
-                span = re.search(br'"type": "bytes"', value)
+                span = re.search(br'"message": "', value)
                 match = value[span.end():-2]
-                value = json.loads(value[:span.start() + b'}'])
+                value = json.loads(value[:span.start() - 2] + b'}')
                 value['message'] = match
             else:
                 value = json.loads(value)
@@ -30,7 +30,7 @@ async def __websocket_connectionHandle(protocol: 'WebsocketProtocol'):
                     await protocol.func[0].close()
                 elif value['type'] in [ 'text', 'bytes' ]:
                     await protocol.func[0].send(value['message'])
-    except asyncio.CancelledError:
+    except:
         await pubsub.close()
 
 async def _websocket_connectionHandle(protocol: 'WebsocketProtocol', app):
