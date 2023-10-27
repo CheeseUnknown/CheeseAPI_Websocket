@@ -15,7 +15,7 @@ class Websocket:
         self.redis = Redis(host, port, db)
         self.async_redis = async_Redis(host = host, port = port, db = db)
 
-    def send(self, path: str, message: str | bytes | list | dict, sid: str | List[str] | Literal['*'] = '*'):
+    def send(self, path: str, message: str | bytes, sid: str | List[str] | Literal['*'] = '*'):
         if not self.redis:
             raise ConnectionError('Redis has not be connected')
 
@@ -32,7 +32,7 @@ class Websocket:
                 'message': message
             }))
 
-    async def async_send(self, path: str, message: str | bytes | list | dict, sid: str | List[str] | Literal['*'] = '*'):
+    async def async_send(self, path: str, message: str | bytes, sid: str | List[str] | Literal['*'] = '*'):
         if not self.async_redis:
             raise ConnectionError('Redis has not be connected')
 
