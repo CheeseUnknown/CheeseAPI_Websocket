@@ -1,7 +1,8 @@
-import asyncio, re, json
+import asyncio, re, json, traceback
 from typing import TYPE_CHECKING
 
 from CheeseAPI import app
+from CheeseAPI.app import App
 from CheeseLog import logger
 
 from CheeseAPI_Websocket.websocket import websocket
@@ -30,24 +31,38 @@ async def __websocket_connectionHandle(protocol: 'WebsocketProtocol'):
                     await protocol.func[0].close()
                 elif value['type'] in [ 'text', 'bytes' ]:
                     await protocol.func[0].send(value['message'])
+                elif value['type'] == 'json':
+                    await protocol.func[0].send(json.dumps(value['message']))
     except:
         await pubsub.close()
 
-async def _websocket_connectionHandle(protocol: 'WebsocketProtocol', app):
-    logger.websocket(f'The {protocol.request.headers.get("X-Forwarded-For").split(", ")[0]} connected WEBSOCKET {protocol.request.fullPath}', f'The <cyan>{protocol.request.headers.get("X-Forwarded-For").split(", ")[0]}</cyan> connected <cyan>WEBSOCKET {protocol.request.fullPath}</cyan>')
+async def _websocket_connectionHandle(protocol: 'WebsocketProtocol', app: App):
+    try:
+        logger.websocket(f'The {protocol.request.headers.get("X-Forwarded-For").split(", ")[0]} connected WEBSOCKET {protocol.request.fullPath}', f'The <cyan>{protocol.request.headers.get("X-Forwarded-For").split(", ")[0]}</cyan> connected <cyan>WEBSOCKET {protocol.request.fullPath}</cyan>')
 
-    protocol.task = asyncio.create_task(__websocket_connectionHandle(protocol))
+        protocol.task = asyncio.create_task(__websocket_connectionHandle(protocol))
 
-    await protocol.func[0].connectionHandle(**protocol.func[1])
+        await protocol.func[0].connectionHandle(**protocol.func[1])
+    except:
+        message = logger.encode(traceback.format_exc()[:-1])
+        logger.danger(f'''An error occurred while connecting WEBSOCKET {protocol.request.fullPath}:
+{message}''', f'''An error occurred while connecting <cyan>WEBSOCKET {protocol.request.fullPath}</cyan>:
+{message}''')
 
 app.handle._websocket_connectionHandle = _websocket_connectionHandle
 
-def _websocket_disconnectionHandle(protocol: 'WebsocketProtocol', app):
-    protocol.func[0].disconnectionHandle(**protocol.func[1])
+def _websocket_disconnectionHandle(protocol: 'WebsocketProtocol', app: App):
+    try:
+        protocol.func[0].disconnectionHandle(**protocol.func[1])
 
-    if hasattr(protocol, 'task'):
-        protocol.task.cancel()
+        if hasattr(protocol, 'task'):
+            protocol.task.cancel()
 
-    logger.websocket(f'The {protocol.request.headers.get("X-Forwarded-For").split(", ")[0]} disconnected WEBSOCKET {protocol.request.fullPath}', f'The <cyan>{protocol.request.headers.get("X-Forwarded-For").split(", ")[0]}</cyan> disconnected <cyan>WEBSOCKET {protocol.request.fullPath}</cyan>')
+        logger.websocket(f'The {protocol.request.headers.get("X-Forwarded-For").split(", ")[0]} disconnected WEBSOCKET {protocol.request.fullPath}', f'The <cyan>{protocol.request.headers.get("X-Forwarded-For").split(", ")[0]}</cyan> disconnected <cyan>WEBSOCKET {protocol.request.fullPath}</cyan>')
+    except:
+        message = logger.encode(traceback.format_exc()[:-1])
+        logger.danger(f'''An error occurred while disconnecting WEBSOCKET {protocol.request.fullPath}:
+{message}''', f'''An error occurred while disconnecting <cyan>WEBSOCKET {protocol.request.fullPath}</cyan>:
+{message}''')
 
 app.handle._websocket_disconnectionHandle = _websocket_disconnectionHandle

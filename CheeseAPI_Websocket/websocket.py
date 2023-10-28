@@ -15,24 +15,29 @@ class Websocket:
         self.redis = Redis(host, port, db)
         self.async_redis = async_Redis(host = host, port = port, db = db)
 
-    def send(self, path: str, message: str | bytes, sid: str | List[str] | Literal['*'] = '*'):
+    def send(self, path: str, message: str | bytes | dict | list, sid: str | List[str] | Literal['*'] = '*'):
         if not self.redis:
             raise ConnectionError('Redis has not be connected')
-
         if isinstance(message, bytes):
             self.redis.publish('Websocket_' + path, json.dumps({
                 'sid': sid,
                 'type': 'bytes',
                 'message': ''
             }).encode().replace(b'"message": ""', b'"message": "' + message + b'"'))
-        else:
+        elif isinstance(message, str):
             self.redis.publish('Websocket_' + path, json.dumps({
                 'sid': sid,
                 'type': 'text',
                 'message': message
             }))
+        else:
+            self.redis.publish('Websocket_' + path, json.dumps({
+                'sid': sid,
+                'type': 'text',
+                'message': json.dumps(message)
+            }))
 
-    async def async_send(self, path: str, message: str | bytes, sid: str | List[str] | Literal['*'] = '*'):
+    async def async_send(self, path: str, message: str | bytes | dict | list, sid: str | List[str] | Literal['*'] = '*'):
         if not self.async_redis:
             raise ConnectionError('Redis has not be connected')
 
@@ -42,11 +47,17 @@ class Websocket:
                 'type': 'bytes',
                 'message': ''
             }).encode().replace(b'"message": ""', b'"message": "' + message + '"'))
-        else:
+        elif isinstance(message, str):
             await self.async_redis.publish(f'Websocket_{path}', json.dumps({
                 'sid': sid,
                 'type': 'text',
                 'message': message
+            }))
+        else:
+            await self.async_redis.publish(f'Websocket_{path}', json.dumps({
+                'sid': sid,
+                'type': 'json',
+                'message': json.dumps(message)
             }))
 
     def close(self, path: str, sid: str | List[str] | Literal['*'] = '*'):
