@@ -59,11 +59,11 @@ from CheeseAPI_Websocket import websocket
 
 初始化redis连接。
 
-### **`websocket.send(path: str, message: str | bytes, sid: str | List[str] | Literal['*'] = '*')`**
+### **`websocket.send(path: str, message: str | bytes | dict | list, sid: str | List[str] | Literal['*'] = '*')`**
 
 发送消息，支持广播。
 
-### **`await websocket.async_send(path: str, message: str | bytes, sid: str | List[str] | Literal['*'] = '*')`**
+### **`await websocket.async_send(path: str, message: str | bytes | dict | list, sid: str | List[str] | Literal['*'] = '*')`**
 
 发送消息，支持广播。
 
