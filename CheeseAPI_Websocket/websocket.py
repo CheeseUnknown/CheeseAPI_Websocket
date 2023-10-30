@@ -34,7 +34,7 @@ class Websocket:
             self.redis.publish('Websocket_' + path, json.dumps({
                 'sid': sid,
                 'type': 'text',
-                'message': json.dumps(message)
+                'message': message
             }))
 
     async def async_send(self, path: str, message: str | bytes | dict | list, sid: str | List[str] | Literal['*'] = '*'):
@@ -57,7 +57,7 @@ class Websocket:
             await self.async_redis.publish(f'Websocket_{path}', json.dumps({
                 'sid': sid,
                 'type': 'json',
-                'message': json.dumps(message)
+                'message': message
             }))
 
     def close(self, path: str, sid: str | List[str] | Literal['*'] = '*'):
