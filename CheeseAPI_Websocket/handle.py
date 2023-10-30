@@ -52,6 +52,9 @@ async def _websocket_connectionHandle(protocol: 'WebsocketProtocol', app: App):
 app.handle._websocket_connectionHandle = _websocket_connectionHandle
 
 def _websocket_disconnectionHandle(protocol: 'WebsocketProtocol', app: App):
+    if not protocol.func:
+        return
+
     try:
         protocol.func[0].disconnectionHandle(**protocol.func[1])
 
