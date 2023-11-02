@@ -33,7 +33,7 @@ class Websocket:
         else:
             self.redis.publish('Websocket_' + path, json.dumps({
                 'sid': sid,
-                'type': 'text',
+                'type': 'json',
                 'message': message
             }))
 
