@@ -6,7 +6,7 @@
 
 ## **安装**
 
-目前仅支持linux python3.11，这里也推荐将python升级到3.11。
+目前仅保证支持3.11及以上的python。
 
 ```bash
 pip install CheeseAPI_Websocket
