@@ -49,7 +49,7 @@ async def _websocket_connectionHandle(protocol: 'WebsocketProtocol', app: App):
 {message}''', f'''An error occurred while connecting <cyan>WEBSOCKET {protocol.request.fullPath}</cyan>:
 {message}''')
 
-app.handle._websocket_connectionHandle = _websocket_connectionHandle
+app._handle._websocket_connectionHandle = _websocket_connectionHandle
 
 def _websocket_disconnectionHandle(protocol: 'WebsocketProtocol', app: App):
     if not protocol.func:
@@ -68,4 +68,4 @@ def _websocket_disconnectionHandle(protocol: 'WebsocketProtocol', app: App):
 {message}''', f'''An error occurred while disconnecting <cyan>WEBSOCKET {protocol.request.fullPath}</cyan>:
 {message}''')
 
-app.handle._websocket_disconnectionHandle = _websocket_disconnectionHandle
+app._handle._websocket_disconnectionHandle = _websocket_disconnectionHandle
