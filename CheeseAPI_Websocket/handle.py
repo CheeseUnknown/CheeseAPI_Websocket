@@ -26,7 +26,7 @@ async def __websocket_connectionHandle(protocol: 'WebsocketProtocol'):
             else:
                 value = json.loads(value)
 
-            if value['sid'] == '*' or protocol.request.headers['Sec-Websocket-Key']  == value or protocol.request.headers['Sec-Websocket-Key'] in value['sid']:
+            if value['sid'] == '*' or protocol.request.headers['Sec-Websocket-Key']  == value['sid'] or protocol.request.headers['Sec-Websocket-Key'] in value['sid']:
                 if value['type'] == 'close':
                     await protocol.func[0].close()
                 elif value['type'] in [ 'text', 'bytes' ]:

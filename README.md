@@ -49,6 +49,8 @@ if __name__ == '__main__':
     app.run()
 ```
 
+若传输的数据量过大，请使用原生的send方法，以避免为redis带来过大的负担。
+
 ## **Websocket**
 
 ```python

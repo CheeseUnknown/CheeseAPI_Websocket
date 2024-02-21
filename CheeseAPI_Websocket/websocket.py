@@ -3,7 +3,6 @@ from typing import List, Literal
 
 from redis import Redis
 from redis.asyncio import Redis as async_Redis
-from CheeseType import IPv4, Port, NonNegativeInt
 from CheeseAPI import app
 
 class Websocket:
@@ -11,7 +10,7 @@ class Websocket:
         self.redis: Redis | None = None
         self.async_redis: async_Redis | None = None
 
-    def init(self, host: IPv4 = app.server.host, port: Port = 6379, db: NonNegativeInt = 0):
+    def init(self, host: str = app.server.host, port: int = 6379, db: int = 0):
         self.redis = Redis(host, port, db)
         self.async_redis = async_Redis(host = host, port = port, db = db)
 

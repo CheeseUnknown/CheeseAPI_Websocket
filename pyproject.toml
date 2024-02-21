@@ -1,15 +1,18 @@
 [build-system]
-requires = ["hatchling"]
+requires = [ "hatchling" ]
 build-backend = "hatchling.build"
 
 [project]
 name = "CheeseAPI_Websocket"
-version = "0.1.10"
+version = "0.1.11"
 description = "一款基于CheeseAPI的升级款Websocket插件。"
 readme = "README.md"
+license-files = { paths = [ "LICENSE" ] }
 authors = [
     { name = "Cheese Unknown", email = "cheese@cheese.ren" }
 ]
+keywords = [ 'websocket' ]
+
 dependencies = [
     "CheeseAPI",
     "redis"
@@ -19,4 +22,4 @@ dependencies = [
 Source = "https://github.com/CheeseUnknown/CheeseAPI_Websocket"
 
 [tool.hatch.build.targets.sdist]
-include = ["/CheeseAPI_Websocket"]
+include = [ "/CheeseAPI_Websocket" ]
