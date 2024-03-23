@@ -15,8 +15,6 @@ class Websocket:
         self.async_redis = async_Redis(host = host, port = port, db = db)
 
     def send(self, path: str, message: str | bytes | dict | list, sid: str | List[str] | Literal['*'] = '*'):
-        if not self.redis:
-            raise ConnectionError('Redis has not be connected')
         if isinstance(message, bytes):
             self.redis.publish('Websocket_' + path, json.dumps({
                 'sid': sid,
@@ -37,9 +35,6 @@ class Websocket:
             }))
 
     async def async_send(self, path: str, message: str | bytes | dict | list, sid: str | List[str] | Literal['*'] = '*'):
-        if not self.async_redis:
-            raise ConnectionError('Redis has not be connected')
-
         if isinstance(message, bytes):
             await self.async_redis.publish(f'Websocket_{path}', json.dumps({
                 'sid': sid,
@@ -60,18 +55,12 @@ class Websocket:
             }))
 
     def close(self, path: str, sid: str | List[str] | Literal['*'] = '*'):
-        if not self.redis:
-            raise ConnectionError('Redis has not be connected')
-
         self.redis.publish('Websocket_' + path, json.dumps({
             'sid': sid,
             'type': 'close'
         }))
 
     async def async_close(self, path: str, sid: str | List[str] | Literal['*'] = '*'):
-        if not self.async_redis:
-            raise ConnectionError('Redis has not be connected')
-
         await self.async_redis.publish('Websocket_' + path, json.dumps({
             'sid': sid,
             'type': 'close'

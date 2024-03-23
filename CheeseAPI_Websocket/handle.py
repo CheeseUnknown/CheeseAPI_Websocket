@@ -1,8 +1,8 @@
-import asyncio, re, json, traceback
+import asyncio, re, json
 from typing import TYPE_CHECKING
 
 from CheeseAPI import app
-from CheeseAPI.app import App
+from CheeseAPI.handle import Handle
 from CheeseLog import logger
 
 from CheeseAPI_Websocket.websocket import websocket
@@ -10,7 +10,7 @@ from CheeseAPI_Websocket.websocket import websocket
 if TYPE_CHECKING:
     from CheeseAPI.protocol import WebsocketProtocol
 
-async def __websocket_connectionHandle(protocol: 'WebsocketProtocol'):
+async def _websocket_connection(protocol: 'WebsocketProtocol'):
     try:
         pubsub = websocket.async_redis.pubsub()
         await pubsub.subscribe('Websocket_' + protocol.request.path)
@@ -28,44 +28,30 @@ async def __websocket_connectionHandle(protocol: 'WebsocketProtocol'):
 
             if value['sid'] == '*' or protocol.request.headers['Sec-Websocket-Key']  == value['sid'] or protocol.request.headers['Sec-Websocket-Key'] in value['sid']:
                 if value['type'] == 'close':
-                    await protocol.func[0].close()
+                    await protocol.server.close()
                 elif value['type'] in [ 'text', 'bytes' ]:
-                    await protocol.func[0].send(value['message'])
+                    await protocol.server.send(value['message'])
                 elif value['type'] == 'json':
-                    await protocol.func[0].send(json.dumps(value['message']))
+                    await protocol.server.send(json.dumps(value['message']))
     except:
         await pubsub.close()
 
-async def _websocket_connectionHandle(protocol: 'WebsocketProtocol', app: App):
-    try:
-        logger.websocket(f'The {protocol.request.headers.get("X-Forwarded-For").split(", ")[0]} connected WEBSOCKET {protocol.request.fullPath}', f'The <cyan>{protocol.request.headers.get("X-Forwarded-For").split(", ")[0]}</cyan> connected <cyan>WEBSOCKET {protocol.request.fullPath}</cyan>')
+async def websocket_connection(self: 'Handle', protocol: 'WebsocketProtocol'):
+    for text in self._app._text.websocket_connection(protocol):
+        logger.websocket(text[0], text[1])
+    protocol.task = asyncio.create_task(_websocket_connection(protocol))
 
-        protocol.task = asyncio.create_task(__websocket_connectionHandle(protocol))
+app._handle.websocket_connection = websocket_connection
 
-        await protocol.func[0].connectionHandle(**protocol.func[1])
-    except:
-        message = logger.encode(traceback.format_exc()[:-1])
-        logger.danger(f'''An error occurred while connecting WEBSOCKET {protocol.request.fullPath}:
-{message}''', f'''An error occurred while connecting <cyan>WEBSOCKET {protocol.request.fullPath}</cyan>:
-{message}''')
+async def websocket_disconnection(self: 'Handle', protocol: 'WebsocketProtocol'):
+    protocol.task.cancel()
 
-app._handle._websocket_connectionHandle = _websocket_connectionHandle
+    await protocol.server.disconnection(**{
+        'request': protocol.request,
+        **protocol.kwargs
+    })
 
-def _websocket_disconnectionHandle(protocol: 'WebsocketProtocol', app: App):
-    if not protocol.func:
-        return
+    for text in self._app._text.websocket_disconnection(protocol):
+        logger.websocket(text[0], text[1])
 
-    try:
-        protocol.func[0].disconnectionHandle(**protocol.func[1])
-
-        if hasattr(protocol, 'task'):
-            protocol.task.cancel()
-
-        logger.websocket(f'The {protocol.request.headers.get("X-Forwarded-For").split(", ")[0]} disconnected WEBSOCKET {protocol.request.fullPath}', f'The <cyan>{protocol.request.headers.get("X-Forwarded-For").split(", ")[0]}</cyan> disconnected <cyan>WEBSOCKET {protocol.request.fullPath}</cyan>')
-    except:
-        message = logger.encode(traceback.format_exc()[:-1])
-        logger.danger(f'''An error occurred while disconnecting WEBSOCKET {protocol.request.fullPath}:
-{message}''', f'''An error occurred while disconnecting <cyan>WEBSOCKET {protocol.request.fullPath}</cyan>:
-{message}''')
-
-app._handle._websocket_disconnectionHandle = _websocket_disconnectionHandle
+app._handle.websocket_disconnection = websocket_disconnection
