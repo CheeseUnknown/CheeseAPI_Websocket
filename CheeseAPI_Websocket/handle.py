@@ -1,4 +1,4 @@
-import asyncio, re, json
+import asyncio, re, json, types
 from typing import TYPE_CHECKING
 
 from CheeseAPI import app
@@ -33,7 +33,7 @@ async def _websocket_connection(protocol: 'WebsocketProtocol'):
                     await protocol.server.send(value['message'])
                 elif value['type'] == 'json':
                     await protocol.server.send(json.dumps(value['message']))
-    except:
+    except asyncio.CancelledError:
         await pubsub.close()
 
 async def websocket_connection(self: 'Handle', protocol: 'WebsocketProtocol'):
@@ -41,7 +41,7 @@ async def websocket_connection(self: 'Handle', protocol: 'WebsocketProtocol'):
         logger.websocket(text[0], text[1])
     protocol.task = asyncio.create_task(_websocket_connection(protocol))
 
-app._handle.websocket_connection = websocket_connection
+app._handle.websocket_connection = types.MethodType(websocket_connection, app._handle)
 
 async def websocket_disconnection(self: 'Handle', protocol: 'WebsocketProtocol'):
     protocol.task.cancel()
@@ -54,4 +54,4 @@ async def websocket_disconnection(self: 'Handle', protocol: 'WebsocketProtocol')
     for text in self._app._text.websocket_disconnection(protocol):
         logger.websocket(text[0], text[1])
 
-app._handle.websocket_disconnection = websocket_disconnection
+app._handle.websocket_disconnection = types.MethodType(websocket_disconnection, app._handle)
