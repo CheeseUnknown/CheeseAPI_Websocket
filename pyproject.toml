@@ -11,7 +11,7 @@ license-files = { paths = [ "LICENSE" ] }
 authors = [
     { name = "Cheese Unknown", email = "cheese@cheese.ren" }
 ]
-keywords = [ 'websocket' ]
+keywords = [ 'CheeseAPI', 'websocket' ]
 
 dependencies = [
     "CheeseAPI==1.1.*",

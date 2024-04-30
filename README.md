@@ -22,7 +22,7 @@ import threading, time
 from CheeseAPI import app, WebsocketClient, Response
 from CheeseAPI_Websocket import websocket
 
-app.modules = [ 'CheeseAPI_Websocket' ] # 加入模块
+app.modules.append('CheeseAPI_Websocket') # 加入模块
 
 websocket.init() # 初始化redis连接
 
