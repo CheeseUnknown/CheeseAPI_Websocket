@@ -12,6 +12,15 @@
 pip install CheeseAPI_Websocket
 ```
 
+对应CheeseAPI版本：
+
+| 版本 | CheeseAPI版本 |
+| - | - |
+| 1.0.3 | 1.3.* |
+| 1.0.2 | 1.2.* |
+| 1.0.1 | 1.1.* |
+| 1.0.0 | 1.0.* |
+
 ## **使用**
 
 CheeseAPI_Websocket是[CheeseAPI](https://github.com/CheeseUnknown/CheeseAPI)的一款插件，它需要依赖于[CheeseAPI](https://github.com/CheeseUnknown/CheeseAPI)才能运行。
