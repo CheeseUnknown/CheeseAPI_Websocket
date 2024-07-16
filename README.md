@@ -6,20 +6,11 @@
 
 ## **安装**
 
-目前仅保证支持3.11及以上的python。
+系统要求：Unix，例如Linux、Mac等；不支持Windows，若有需要请使用Windows的WSL运行程序。
 
 ```bash
 pip install CheeseAPI_Websocket
 ```
-
-对应CheeseAPI版本：
-
-| 版本 | CheeseAPI版本 |
-| - | - |
-| 1.0.3 | 1.3.* |
-| 1.0.2 | 1.2.* |
-| 1.0.1 | 1.1.* |
-| 1.0.0 | 1.0.* |
 
 ## **使用**
 
@@ -54,8 +45,7 @@ async def test1():
     await websocket.async_send('/', '世界')
     return Response()
 
-if __name__ == '__main__':
-    app.run()
+app.run()
 ```
 
 若传输的数据量过大，请使用原生的send方法，以避免为redis带来过大的负担。

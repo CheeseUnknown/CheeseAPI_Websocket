@@ -14,7 +14,7 @@ authors = [
 keywords = [ 'CheeseAPI', 'websocket' ]
 
 dependencies = [
-    "CheeseAPI==1.5.*",
+    "CheeseAPI==1.6.*",
     "redis"
 ]
 
