@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "CheeseAPI_Websocket"
-version = "1.0.5"
+version = "1.0.6"
 description = "一款基于CheeseAPI的升级款Websocket插件。"
 readme = "README.md"
 license-files = { paths = [ "LICENSE" ] }
