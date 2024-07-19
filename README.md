@@ -16,6 +16,8 @@ pip install CheeseAPI_Websocket
 
 CheeseAPI_Websocket是[CheeseAPI](https://github.com/CheeseUnknown/CheeseAPI)的一款插件，它需要依赖于[CheeseAPI](https://github.com/CheeseUnknown/CheeseAPI)才能运行。
 
+默认情况下，它会连接到本地默认端口下的redis db0。
+
 ```python
 import threading, time
 
@@ -23,8 +25,6 @@ from CheeseAPI import app, WebsocketClient, Response
 from CheeseAPI_Websocket import websocket
 
 app.modules.append('CheeseAPI_Websocket') # 加入模块
-
-websocket.init() # 初始化redis连接
 
 @app.route.websocket('/')
 class Test(WebsocketClient):
@@ -48,7 +48,11 @@ async def test1():
 app.run()
 ```
 
-若传输的数据量过大，请使用原生的send方法，以避免为redis带来过大的负担。
+请注意下列情况：
+
+1. 若传输的数据量过大，请使用原生的send方法，以避免为redis带来过大的负担。
+
+2. 多个不同数据源的服务器连接到同一个redis数据库，会导致websocket消息错乱。
 
 ## **Websocket**
 
@@ -56,9 +60,17 @@ app.run()
 from CheeseAPI_Websocket import websocket
 ```
 
-### **`websocket.init(host: IPv4 = app.server.host, port: Port = 6379, db: NonNegativeInt = 0)`**
+### **`websocket.host: str = 'localhost'`**
 
-初始化redis连接。
+连接的redis host。
+
+### **`websocket.port: int = 6379`**
+
+连接的redis端口。
+
+### **`websocket.db: int = 0`**
+
+连接的redis数据库。
 
 ### **`websocket.send(path: str, message: str | bytes | dict | list, sid: str | List[str] | Literal['*'] = '*')`**
 

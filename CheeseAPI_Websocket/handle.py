@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 async def _websocket_connection(protocol: 'WebsocketProtocol'):
     try:
-        pubsub = websocket.async_redis.pubsub()
+        pubsub = websocket._async_redis.pubsub()
         await pubsub.subscribe('Websocket_' + protocol.request.path)
         await pubsub.parse_response()
         while True:
